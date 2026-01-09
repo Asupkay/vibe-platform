@@ -29,9 +29,17 @@ impl ZdotdirSetup {
 
         fs::create_dir_all(&zdotdir_path).context("Failed to create ZDOTDIR")?;
 
-        // Get path to vibe.zsh
-        let integration_path = PathBuf::from(&home)
-            .join("vibe-terminal/shell-integration");
+        // Get path to vibe.zsh - use CARGO_MANIFEST_DIR at compile time
+        let integration_path = if cfg!(debug_assertions) {
+            // Development: use project directory
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .parent()
+                .unwrap()
+                .join("shell-integration")
+        } else {
+            // Production: shell-integration should be bundled with the app
+            PathBuf::from(&home).join(".vibecodings/shell-integration")
+        };
 
         // Read template
         let template_path = integration_path.join(".zshrc.template");

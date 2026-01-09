@@ -11,9 +11,15 @@ export default function Terminal() {
   const fitAddonRef = useRef<FitAddon | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const sessionIdRef = useRef<string | null>(null); // Use ref to avoid closure issues
 
   useEffect(() => {
-    if (!terminalRef.current) return;
+    if (!terminalRef.current) {
+      console.log("Terminal ref not ready");
+      return;
+    }
+
+    console.log("Initializing xterm.js terminal...");
 
     // Create xterm instance
     const term = new XTerm({
@@ -58,6 +64,11 @@ export default function Terminal() {
     xtermRef.current = term;
     fitAddonRef.current = fitAddon;
 
+    // Focus the terminal so it can receive keyboard input
+    console.log("Focusing terminal after open...");
+    term.focus();
+    console.log("Terminal focused. Textarea element:", term.textarea);
+
     // Handle resize
     const handleResize = () => {
       fitAddon.fit();
@@ -71,12 +82,24 @@ export default function Terminal() {
 
     window.addEventListener("resize", handleResize);
 
+    // Global click handler to refocus terminal
+    const handleGlobalClick = () => {
+      console.log("Window clicked, refocusing terminal...");
+      term.focus();
+    };
+    window.addEventListener("click", handleGlobalClick);
+
     // Handle user input
     term.onData((data) => {
-      if (sessionId) {
+      console.log("Terminal received input:", data);
+      // Use ref to get current session ID (avoids closure issue)
+      const currentSessionId = sessionIdRef.current;
+      if (currentSessionId) {
         const encoder = new TextEncoder();
         const bytes = encoder.encode(data);
         invoke("send_input", { data: Array.from(bytes) }).catch(console.error);
+      } else {
+        console.warn("Session not ready, input ignored. SessionId:", currentSessionId);
       }
     });
 
@@ -87,8 +110,12 @@ export default function Terminal() {
     })
       .then((id) => {
         setSessionId(id);
+        sessionIdRef.current = id; // Update ref for input handler
         setIsReady(true);
         console.log("Session started:", id);
+        console.log("SessionIdRef updated to:", sessionIdRef.current);
+        // Focus terminal again after session starts
+        setTimeout(() => term.focus(), 100);
       })
       .catch((error) => {
         console.error("Failed to start session:", error);
@@ -97,7 +124,9 @@ export default function Terminal() {
 
     // Cleanup
     return () => {
+      console.log("Cleaning up terminal...");
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("click", handleGlobalClick);
       if (sessionId) {
         invoke("end_session").catch(console.error);
       }
@@ -131,10 +160,17 @@ export default function Terminal() {
   return (
     <div
       ref={terminalRef}
+      onClick={() => {
+        // Focus terminal when clicked
+        if (xtermRef.current) {
+          xtermRef.current.focus();
+        }
+      }}
       style={{
         width: "100%",
         height: "100%",
         padding: "8px",
+        cursor: "text",
       }}
     />
   );
