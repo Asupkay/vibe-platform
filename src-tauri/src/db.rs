@@ -61,6 +61,26 @@ impl Database {
             [],
         )?;
 
+        // Commands table for shell integration markers
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS commands (
+                id TEXT PRIMARY KEY,
+                session_id TEXT NOT NULL,
+                started_at INTEGER NOT NULL,
+                ended_at INTEGER,
+                exit_code INTEGER,
+                input TEXT,
+                FOREIGN KEY(session_id) REFERENCES sessions(id)
+            )",
+            [],
+        )?;
+
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_commands_session
+             ON commands(session_id)",
+            [],
+        )?;
+
         Ok(Database { conn })
     }
 
@@ -174,5 +194,49 @@ impl Database {
             .collect::<Result<Vec<_>, _>>()?;
 
         Ok(sessions)
+    }
+
+    // Command methods for shell integration
+    pub fn create_command(&self, session_id: &str, input: &str) -> Result<String> {
+        let id = Uuid::new_v4().to_string();
+        let started_at = Utc::now().timestamp_millis();
+
+        self.conn.execute(
+            "INSERT INTO commands (id, session_id, started_at, input) VALUES (?1, ?2, ?3, ?4)",
+            params![&id, session_id, started_at, input],
+        )?;
+
+        Ok(id)
+    }
+
+    pub fn end_command(&self, session_id: &str, exit_code: i32) -> Result<()> {
+        let ended_at = Utc::now().timestamp_millis();
+
+        // Find the most recent command for this session without an end time
+        self.conn.execute(
+            "UPDATE commands
+             SET ended_at = ?1, exit_code = ?2
+             WHERE session_id = ?3 AND ended_at IS NULL
+             ORDER BY started_at DESC LIMIT 1",
+            params![ended_at, exit_code, session_id],
+        )?;
+
+        Ok(())
+    }
+
+    pub fn get_recent_commands(&self, session_id: &str, limit: usize) -> Result<Vec<(String, i32)>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT input, COALESCE(exit_code, -1) FROM commands
+             WHERE session_id = ?1
+             ORDER BY started_at DESC LIMIT ?2",
+        )?;
+
+        let commands = stmt
+            .query_map(params![session_id, limit], |row| {
+                Ok((row.get(0)?, row.get(1)?))
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok(commands)
     }
 }

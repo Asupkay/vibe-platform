@@ -3,6 +3,7 @@
 
 mod db;
 mod pty;
+mod osc;
 
 use db::Database;
 use pty::PtySession;

@@ -1,0 +1,19 @@
+# VIBE - Generated .zshrc wrapper for session: {{SESSION_ID}}
+# This file is auto-generated - do not edit manually
+
+# Set VIBE environment variables
+export VIBE_NONCE="{{NONCE}}"
+export VIBE_SESSION_ID="{{SESSION_ID}}"
+export VIBE_SHELL=1
+
+# Save original ZDOTDIR for user's real config
+export VIBE_USER_ZDOTDIR="${HOME}"
+
+# Source user's real .zshrc (if it exists and not already sourced)
+if [[ -f "${HOME}/.zshrc" && -z "$VIBE_USER_ZSHRC_SOURCED" ]]; then
+    export VIBE_USER_ZSHRC_SOURCED=1
+    source "${HOME}/.zshrc"
+fi
+
+# Source VIBE shell integration
+source "{{VIBE_INTEGRATION_PATH}}/vibe.zsh"
