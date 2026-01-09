@@ -1,17 +1,88 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { Terminal as XTerm } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { invoke } from "@tauri-apps/api/tauri";
 import "@xterm/xterm/css/xterm.css";
 
-export default function Terminal() {
+interface Event {
+  id: string;
+  session_id: string;
+  ts: string;
+  kind: string;
+  data: string;
+}
+
+const Terminal = forwardRef((props, ref) => {
   const terminalRef = useRef<HTMLDivElement>(null);
   const xtermRef = useRef<XTerm | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const sessionIdRef = useRef<string | null>(null); // Use ref to avoid closure issues
+  const isReplayingRef = useRef(false);
+
+  // Expose methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    replaySession: async (replaySessionId: string, speed: "instant" | "2x" | "realtime", fromTimestamp?: number) => {
+      if (!xtermRef.current || isReplayingRef.current) return;
+
+      isReplayingRef.current = true;
+      const term = xtermRef.current;
+
+      try {
+        // Fetch session events
+        let events = await invoke<Event[]>("get_session_events", { sessionId: replaySessionId });
+
+        // Filter events if fromTimestamp is provided
+        if (fromTimestamp !== undefined) {
+          events = events.filter(event => {
+            const eventTime = new Date(event.ts).getTime();
+            return eventTime >= fromTimestamp;
+          });
+        }
+
+        // Clear terminal
+        term.clear();
+        if (fromTimestamp !== undefined) {
+          term.write("\x1b[36m[Replaying from command...]\x1b[0m\r\n\r\n");
+        } else {
+          term.write("\x1b[36m[Replaying session...]\x1b[0m\r\n\r\n");
+        }
+
+        // Calculate timing multiplier
+        const speedMultiplier = speed === "instant" ? 0 : speed === "2x" ? 0.5 : 1;
+
+        // Replay events
+        for (let i = 0; i < events.length; i++) {
+          const event = events[i];
+
+          // Only replay output events
+          if (event.kind === "pty_out") {
+            term.write(event.data);
+          }
+
+          // Add delay based on timing (except for instant)
+          if (speedMultiplier > 0 && i < events.length - 1) {
+            const currentTime = new Date(event.ts).getTime();
+            const nextTime = new Date(events[i + 1].ts).getTime();
+            const delay = (nextTime - currentTime) * speedMultiplier;
+
+            if (delay > 0) {
+              await new Promise(resolve => setTimeout(resolve, Math.min(delay, 1000))); // Cap at 1s
+            }
+          }
+        }
+
+        term.write("\r\n\r\n\x1b[36m[Replay complete]\x1b[0m\r\n");
+      } catch (error) {
+        console.error("Replay failed:", error);
+        term.write("\r\n\x1b[31m[Replay failed]\x1b[0m\r\n");
+      } finally {
+        isReplayingRef.current = false;
+      }
+    },
+  }));
 
   useEffect(() => {
     if (!terminalRef.current) return;
@@ -158,4 +229,7 @@ export default function Terminal() {
       }}
     />
   );
-}
+});
+
+Terminal.displayName = "Terminal";
+export default Terminal;

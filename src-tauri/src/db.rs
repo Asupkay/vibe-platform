@@ -23,6 +23,27 @@ pub struct Event {
     pub data: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Command {
+    pub id: String,
+    pub session_id: String,
+    pub input: Option<String>,
+    pub exit_code: Option<i32>,
+    pub started_at: i64,
+    pub ended_at: Option<i64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SessionSummary {
+    pub id: String,
+    pub started_at: String,
+    pub ended_at: Option<String>,
+    pub cwd: String,
+    pub shell: String,
+    pub command_count: i64,
+    pub commands: Vec<Command>,
+}
+
 pub struct Database {
     conn: Connection,
 }
@@ -175,6 +196,40 @@ impl Database {
         Ok(events)
     }
 
+    pub fn get_sessions_with_commands(&self, limit: usize) -> Result<Vec<SessionSummary>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT
+                s.id,
+                s.started_at,
+                s.ended_at,
+                s.cwd,
+                s.shell,
+                COUNT(c.id) as command_count
+             FROM sessions s
+             LEFT JOIN commands c ON s.id = c.session_id
+             GROUP BY s.id
+             ORDER BY s.started_at DESC
+             LIMIT ?1",
+        )?;
+
+        let sessions = stmt
+            .query_map(params![limit], |row| {
+                let session_id: String = row.get(0)?;
+                Ok(SessionSummary {
+                    id: session_id,
+                    started_at: row.get(1)?,
+                    ended_at: row.get(2)?,
+                    cwd: row.get(3)?,
+                    shell: row.get(4)?,
+                    command_count: row.get(5)?,
+                    commands: vec![], // Will be filled in next query
+                })
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok(sessions)
+    }
+
     pub fn get_recent_sessions(&self, limit: usize) -> Result<Vec<Session>> {
         let mut stmt = self.conn.prepare(
             "SELECT id, started_at, ended_at, cwd, shell FROM sessions
@@ -245,6 +300,30 @@ impl Database {
         let commands = stmt
             .query_map(params![session_id, limit], |row| {
                 Ok((row.get(0)?, row.get(1)?))
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
+
+        Ok(commands)
+    }
+
+    pub fn get_commands(&self, session_id: &str) -> Result<Vec<Command>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, session_id, input, exit_code, started_at, ended_at
+             FROM commands
+             WHERE session_id = ?1
+             ORDER BY started_at ASC",
+        )?;
+
+        let commands = stmt
+            .query_map(params![session_id], |row| {
+                Ok(Command {
+                    id: row.get(0)?,
+                    session_id: row.get(1)?,
+                    input: row.get(2)?,
+                    exit_code: row.get(3)?,
+                    started_at: row.get(4)?,
+                    ended_at: row.get(5)?,
+                })
             })?
             .collect::<Result<Vec<_>, _>>()?;
 

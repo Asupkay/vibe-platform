@@ -164,6 +164,50 @@ fn get_session_events(state: State<AppState>, session_id: String) -> Result<Vec<
         .map_err(|e| format!("Failed to get events: {}", e))
 }
 
+#[tauri::command]
+fn get_sessions_with_commands(state: State<AppState>, limit: usize) -> Result<Vec<db::SessionSummary>, String> {
+    let db = state.db.lock().unwrap();
+    db.get_sessions_with_commands(limit)
+        .map_err(|e| format!("Failed to get sessions: {}", e))
+}
+
+#[tauri::command]
+fn get_commands(state: State<AppState>, session_id: String) -> Result<Vec<db::Command>, String> {
+    let db = state.db.lock().unwrap();
+    db.get_commands(&session_id)
+        .map_err(|e| format!("Failed to get commands: {}", e))
+}
+
+#[tauri::command]
+fn export_session_json(state: State<AppState>, session_id: String) -> Result<String, String> {
+    let db = state.db.lock().unwrap();
+
+    // Get session
+    let session = db.get_session(&session_id)
+        .map_err(|e| format!("Failed to get session: {}", e))?
+        .ok_or("Session not found")?;
+
+    // Get commands
+    let commands = db.get_commands(&session_id)
+        .map_err(|e| format!("Failed to get commands: {}", e))?;
+
+    // Get events
+    let events = db.get_events(&session_id)
+        .map_err(|e| format!("Failed to get events: {}", e))?;
+
+    // Build export structure
+    let export = serde_json::json!({
+        "version": "1.0",
+        "exported_at": chrono::Utc::now().to_rfc3339(),
+        "session": session,
+        "commands": commands,
+        "events": events,
+    });
+
+    serde_json::to_string_pretty(&export)
+        .map_err(|e| format!("Failed to serialize: {}", e))
+}
+
 fn main() {
     // Initialize database
     let db = Database::new().expect("Failed to initialize database");
@@ -183,6 +227,9 @@ fn main() {
             end_session,
             get_recent_sessions,
             get_session_events,
+            get_sessions_with_commands,
+            get_commands,
+            export_session_json,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
