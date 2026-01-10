@@ -1,0 +1,5 @@
+{
+  "version": "0.2.3",
+  "updated": "2026-01-09",
+  "changelog": "Postgres funnel tracking, KV rate limit fixes, stats accuracy"
+}
