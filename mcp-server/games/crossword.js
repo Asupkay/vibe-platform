@@ -3,13 +3,37 @@
  * Daily 5x5 mini puzzles with collaborative and competitive modes
  */
 
-const clg = require('crossword-layout-generator');
+// Lazy-load crossword-layout-generator to avoid crashing server if not installed
+let clg = null;
+let clgLoadError = null;
+
+try {
+  clg = require('crossword-layout-generator');
+} catch (err) {
+  clgLoadError = err.message;
+  console.warn('[crossword] crossword-layout-generator not installed. Run: cd ~/.vibe/vibe-repo/mcp-server && npm install');
+}
+
 const { getWordsForDate, getTodayDateStr } = require('./crossword-words');
+
+/**
+ * Check if crossword module is available
+ */
+function isAvailable() {
+  return clg !== null;
+}
+
+function getLoadError() {
+  return clgLoadError;
+}
 
 /**
  * Create a crossword puzzle from a word list
  */
 function generatePuzzle(wordList) {
+  if (!clg) {
+    throw new Error('Crossword not available. Run: cd ~/.vibe/vibe-repo/mcp-server && npm install');
+  }
   const layout = clg.generateLayout(wordList);
 
   // Build clues map from layout (filter out unplaced words with orientation "none")
@@ -424,6 +448,8 @@ function formatDuration(ms) {
 }
 
 module.exports = {
+  isAvailable,
+  getLoadError,
   createInitialCrosswordState,
   createDailyPuzzle,
   generatePuzzle,

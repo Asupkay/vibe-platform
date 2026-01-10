@@ -200,6 +200,22 @@ function listRooms() {
 
 // Handler
 async function handler(args) {
+  // Check if crossword module is available
+  if (!crossword.isAvailable()) {
+    return {
+      display: `**Crossword not available**
+
+The crossword-layout-generator module isn't installed.
+
+**To fix:**
+\`\`\`bash
+cd ~/.vibe/vibe-repo/mcp-server && npm install
+\`\`\`
+
+Then restart Claude Code.`
+    };
+  }
+
   // Require init
   const initCheck = requireInit();
   if (initCheck) {
