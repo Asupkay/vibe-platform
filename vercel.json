@@ -3,6 +3,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/a/:slug",
+      "destination": "/api/artifacts/:slug"
+    },
+    {
       "source": "/",
       "destination": "https://www.vibe.fyi"
     }
