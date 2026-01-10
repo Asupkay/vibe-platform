@@ -1,14 +1,58 @@
 {
+  "buildCommand": null,
+  "outputDirectory": null,
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
+  "headers": [
     {
-      "source": "/a/:slug",
-      "destination": "/api/artifacts/:slug"
+      "source": "/api/openapi.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
     },
     {
-      "source": "/",
-      "destination": "https://www.vibe.fyi"
+      "source": "/llms.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    },
+    {
+      "source": "/.well-known/airc",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
     }
+  ],
+  "rewrites": [
+    { "source": "/a/:slug", "destination": "/api/artifacts/:slug" },
+    { "source": "/api/presence/heartbeat", "destination": "/api/presence/heartbeat.js" },
+    { "source": "/api/presence/who", "destination": "/api/presence/who.js" },
+    { "source": "/api/messages/send", "destination": "/api/messages/send.js" },
+    { "source": "/api/messages/inbox", "destination": "/api/messages/inbox.js" },
+    { "source": "/api/messages/thread", "destination": "/api/messages/thread.js" },
+    { "source": "/api/presence", "destination": "/api/presence.js" },
+    { "source": "/api/messages", "destination": "/api/messages.js" },
+    { "source": "/api/profile", "destination": "/api/profile.js" },
+    { "source": "/api/stats", "destination": "/api/stats.js" },
+    { "source": "/api/board", "destination": "/api/board.js" },
+    { "source": "/api/register", "destination": "/api/register.js" },
+    { "source": "/api/invites", "destination": "/api/invites.js" },
+    { "source": "/api/agents", "destination": "/api/agents.js" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/docs", "destination": "/docs.html" },
+    { "source": "/chronicle", "destination": "/chronicle.html" },
+    { "source": "/leaderboard", "destination": "/leaderboard.html" },
+    { "source": "/status", "destination": "/status.html" },
+    { "source": "/community", "destination": "/community.html" },
+    { "source": "/skills", "destination": "/skills.html" }
   ]
 }
