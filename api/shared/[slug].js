@@ -4,11 +4,9 @@
  * Serve a shared page created via /api/share-page
  */
 
-const { sql, isPostgresEnabled } = require('../lib/db.js');
 const { kv } = require('@vercel/kv');
-const marked = require('marked');
 
-// Simple markdown parser fallback if marked isn't available
+// Simple markdown parser
 function simpleMarkdown(md) {
   return md
     .replace(/^### (.*$)/gim, '<h3>$1</h3>')
@@ -24,11 +22,7 @@ function renderHTML(title, content, contentType, from, createdAt) {
 
   // Convert markdown to HTML if needed
   if (contentType === 'markdown') {
-    try {
-      body = marked ? marked.parse(content) : simpleMarkdown(content);
-    } catch (e) {
-      body = simpleMarkdown(content);
-    }
+    body = simpleMarkdown(content);
   }
 
   return `<!DOCTYPE html>
@@ -185,46 +179,15 @@ module.exports = async function handler(req, res) {
 
     let pageData = null;
 
-    // Try Postgres first
-    if (isPostgresEnabled() && sql) {
-      try {
-        const result = await sql`
-          SELECT slug, from_user, to_user, title, content, content_type, unlisted, expires_at, created_at
-          FROM shared_pages
-          WHERE slug = ${slug}
-          AND (expires_at IS NULL OR expires_at > NOW())
-          LIMIT 1
-        `;
-
-        if (result && result.length > 0) {
-          const row = result[0];
-          pageData = {
-            slug: row.slug,
-            from: row.from_user,
-            to: row.to_user,
-            title: row.title,
-            content: row.content,
-            contentType: row.content_type,
-            unlisted: row.unlisted,
-            expiresAt: row.expires_at,
-            createdAt: row.created_at
-          };
-        }
-      } catch (pgErr) {
-        console.error('[SHARED] Postgres failed:', pgErr.message);
+    // Get from KV
+    try {
+      const kvData = await kv.get(`shared:${slug}`);
+      if (kvData) {
+        pageData = typeof kvData === 'string' ? JSON.parse(kvData) : kvData;
       }
-    }
-
-    // Fallback to KV
-    if (!pageData) {
-      try {
-        const kvData = await kv.get(`shared:${slug}`);
-        if (kvData) {
-          pageData = typeof kvData === 'string' ? JSON.parse(kvData) : kvData;
-        }
-      } catch (kvErr) {
-        console.error('[SHARED] KV failed:', kvErr.message);
-      }
+    } catch (kvErr) {
+      console.error('[SHARED] KV failed:', kvErr);
+      return res.status(500).json({ error: 'Storage error', details: kvErr.message });
     }
 
     if (!pageData) {

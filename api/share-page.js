@@ -2,10 +2,9 @@
  * POST /api/share-page
  *
  * Create a shareable web page that lives at /shared/:slug
- * Stores in Postgres, optionally sends via DM
+ * Stores in KV (simple, no Postgres dependency for now)
  */
 
-const { sql, isPostgresEnabled } = require('./lib/db.js');
 const { kv } = require('@vercel/kv');
 
 function generateSlug() {
@@ -45,7 +44,7 @@ module.exports = async function handler(req, res) {
       slug,
       expiresInDays,
       unlisted = false,
-      sendDM = true
+      sendDM = false // Disabled for now
     } = req.body;
 
     // Validation
@@ -74,73 +73,17 @@ module.exports = async function handler(req, res) {
       contentType,
       unlisted,
       expiresAt,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     };
 
-    // Store in Postgres (primary)
-    let stored = false;
-    if (isPostgresEnabled() && sql) {
-      try {
-        await sql`
-          INSERT INTO shared_pages (slug, from_user, to_user, title, content, content_type, unlisted, expires_at, created_at)
-          VALUES (
-            ${finalSlug},
-            ${pageData.from},
-            ${pageData.to},
-            ${title},
-            ${content},
-            ${contentType},
-            ${unlisted},
-            ${expiresAt},
-            NOW()
-          )
-          ON CONFLICT (slug) DO UPDATE SET
-            title = EXCLUDED.title,
-            content = EXCLUDED.content,
-            content_type = EXCLUDED.content_type,
-            unlisted = EXCLUDED.unlisted,
-            expires_at = EXCLUDED.expires_at
-        `;
-        stored = true;
-      } catch (pgErr) {
-        console.error('[SHARE-PAGE] Postgres failed:', pgErr.message);
-      }
-    }
-
-    // Fallback to KV
-    if (!stored) {
-      try {
-        await kv.set(`shared:${finalSlug}`, JSON.stringify(pageData), {
-          ex: expiresInDays ? expiresInDays * 86400 : undefined
-        });
-        stored = true;
-      } catch (kvErr) {
-        console.error('[SHARE-PAGE] KV failed:', kvErr.message);
-      }
-    }
-
-    if (!stored) {
-      return res.status(503).json({ error: 'Storage unavailable' });
-    }
-
-    // Send DM with link if requested
-    if (sendDM && to) {
-      try {
-        // Import the messages send handler
-        const sendMessage = require('./messages/send.js');
-        const dmBody = `${from} shared: ${title}\n\nhttps://slashvibe.dev/shared/${finalSlug}`;
-
-        await sendMessage({
-          method: 'POST',
-          body: { from, to, body: dmBody }
-        }, {
-          setHeader: () => {},
-          status: () => ({ json: () => {}, end: () => {} })
-        });
-      } catch (dmErr) {
-        console.warn('[SHARE-PAGE] DM send failed:', dmErr.message);
-        // Non-fatal - page still created
-      }
+    // Store in KV
+    try {
+      await kv.set(`shared:${finalSlug}`, JSON.stringify(pageData), {
+        ex: expiresInDays ? expiresInDays * 86400 : undefined
+      });
+    } catch (kvErr) {
+      console.error('[SHARE-PAGE] KV failed:', kvErr);
+      return res.status(503).json({ error: 'Storage unavailable', details: kvErr.message });
     }
 
     const url = `https://slashvibe.dev/shared/${finalSlug}`;
@@ -150,7 +93,7 @@ module.exports = async function handler(req, res) {
       slug: finalSlug,
       url,
       expiresAt,
-      message: sendDM && to ? `Page created and sent to @${to}` : 'Page created'
+      message: 'Page created'
     });
 
   } catch (error) {
