@@ -3,7 +3,12 @@
  * Renders artifact as HTML with social context and provenance
  */
 
+import { getArtifactBySlugFromPostgres } from '../artifacts.js';
+
 const { kv } = await import('@vercel/kv');
+
+// Feature flags
+const READ_FROM_PG = process.env.ARTIFACTS_READ_FROM_PG === 'true';
 
 function renderMarkdown(md) {
   return md
@@ -270,18 +275,23 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing slug parameter' });
     }
 
-    if (!kv) {
-      return res.status(503).send('<h1>Service Unavailable</h1><p>Storage not configured</p>');
-    }
-
-    const artifactIds = await kv.smembers('artifacts:all') || [];
     let artifact = null;
 
-    for (const id of artifactIds) {
-      const a = await kv.get(`artifact:${id}`);
-      if (a && a.slug === slug) {
-        artifact = a;
-        break;
+    // Try Postgres first if enabled, fallback to KV
+    if (READ_FROM_PG) {
+      artifact = await getArtifactBySlugFromPostgres(slug);
+    }
+
+    // Fallback to KV if Postgres didn't return artifact
+    if (!artifact && kv) {
+      const artifactIds = await kv.smembers('artifacts:all') || [];
+
+      for (const id of artifactIds) {
+        const a = await kv.get(`artifact:${id}`);
+        if (a && a.slug === slug) {
+          artifact = a;
+          break;
+        }
       }
     }
 
