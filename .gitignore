@@ -29,3 +29,5 @@ src-tauri/Cargo.lock
 
 # Tauri
 src-tauri/WixTools
+.vercel
+.env*.local
