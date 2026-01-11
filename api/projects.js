@@ -100,11 +100,17 @@ module.exports = async (req, res) => {
 
   if (req.method === 'GET') {
     try {
-      // Read projects.json
-      const projectsPath = path.join(process.cwd(), 'data/projects.json');
-      const data = JSON.parse(fs.readFileSync(projectsPath, 'utf8'));
-
-      let projects = data.projects;
+      // Read projects.json (with fallback for serverless env)
+      let projects = [];
+      try {
+        const projectsPath = path.join(process.cwd(), 'data/projects.json');
+        const data = JSON.parse(fs.readFileSync(projectsPath, 'utf8'));
+        projects = data.projects;
+      } catch (fileError) {
+        console.error('[projects] Failed to read projects.json:', fileError.message);
+        console.log('[projects] Falling back to KV-only mode');
+        // Continue with empty projects array, will merge KV data below
+      }
 
       // Merge in approved projects from KV (user-submitted, auto-approved)
       const kv = await getKV();
