@@ -1,4 +1,8 @@
 /**
+ * SYNC NOTE: This file is duplicated from vibecodings repo
+ * Location: ~/Projects/vibecodings/api/profile.js
+ * vibe-public is now canonical - updates should happen here first
+ *
  * Profile API
  *
  * "Who is @seth?" → Their sessions, DNA, presence.
@@ -68,17 +72,9 @@ export default async function handler(req, res) {
       });
     }
 
-    // Get presence - use kv.get (not hgetall) and correct key pattern
-    const presence = await kv.get(`presence:data:${name}`);
-
-    // Convert ISO timestamp properly before comparing
-    let isOnline = false;
-    if (presence?.lastSeen) {
-      const lastSeenTs = typeof presence.lastSeen === 'string'
-        ? new Date(presence.lastSeen).getTime()
-        : presence.lastSeen;
-      isOnline = (Date.now() - lastSeenTs) < 5 * 60 * 1000;
-    }
+    // Get presence
+    const presence = await kv.hgetall(`presence:${name}`);
+    const isOnline = presence && (Date.now() - (presence.lastSeen || 0)) < 5 * 60 * 1000;
 
     // Build DNA
     const topTech = Object.entries(techCounts)
@@ -94,11 +90,7 @@ export default async function handler(req, res) {
       username: name,
       online: isOnline,
       workingOn: presence?.workingOn || null,
-      lastSeen: presence?.lastSeen ? formatTimeAgo(
-        typeof presence.lastSeen === 'string'
-          ? new Date(presence.lastSeen).getTime()
-          : presence.lastSeen
-      ) : null,
+      lastSeen: presence?.lastSeen ? formatTimeAgo(presence.lastSeen) : null,
       stats: {
         sessions: sessions.length,
         projects: projects.size

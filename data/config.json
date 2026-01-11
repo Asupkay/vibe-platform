@@ -1,0 +1,74 @@
+{
+  "site": {
+    "name": "Vibecodings",
+    "tagline": "The Native Directory for Claude Code Creations",
+    "description": "Where the AI-native builder generation showcases their work. Every prototype, experiment, and shipped product - verified and discoverable.",
+    "url": "https://vibecodings.vercel.app",
+    "logo": null,
+    "favicon": null
+  },
+  "creator": {
+    "username": "seth",
+    "displayName": "Seth Goldstein",
+    "bio": "CEO of Eden, co-founder of Spirit Protocol. 131 days of vibecoding.",
+    "avatar": null,
+    "links": {
+      "twitter": "https://twitter.com/seth",
+      "github": "https://github.com/sethvibes",
+      "website": "https://sethgoldstein.com"
+    },
+    "startDate": "2025-08-04",
+    "featured": true
+  },
+  "categories": [
+    { "id": "agents", "name": "AI Agents", "icon": "🤖", "color": "#00ff00" },
+    { "id": "platform", "name": "Platforms", "icon": "🏗️", "color": "#6B8FFF" },
+    { "id": "art", "name": "Art", "icon": "🎨", "color": "#ff6b6b" },
+    { "id": "tools", "name": "Tools", "icon": "🛠️", "color": "#ffd700" },
+    { "id": "culture", "name": "Culture", "icon": "🌍", "color": "#ff69b4" },
+    { "id": "education", "name": "Education", "icon": "📚", "color": "#4ecdc4" },
+    { "id": "infrastructure", "name": "Infrastructure", "icon": "⚙️", "color": "#888888" }
+  ],
+  "statuses": [
+    { "id": "live", "name": "LIVE", "color": "#00ff00", "description": "Actively deployed and maintained" },
+    { "id": "deployed", "name": "DEPLOYED", "color": "#ffff00", "description": "Shipped but archived/reference" },
+    { "id": "draft", "name": "DRAFT", "color": "#888888", "description": "Work in progress" }
+  ],
+  "design": {
+    "tokens": {
+      "fontDisplay": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+      "colorBg": "#000000",
+      "colorSurface": "#111111",
+      "colorBorder": "#333333",
+      "colorTextPrimary": "#ffffff",
+      "colorTextSecondary": "#888888",
+      "colorTextMuted": "#666666",
+      "colorAccent": "#6B8FFF",
+      "borderWidth": "1px",
+      "transitionBase": "0.2s ease"
+    },
+    "theme": "dark"
+  },
+  "features": {
+    "search": true,
+    "filters": true,
+    "sorting": true,
+    "stats": true,
+    "submit": true,
+    "explore": true,
+    "vercelIntegration": false,
+    "multiUser": false
+  },
+  "api": {
+    "baseUrl": "/api",
+    "endpoints": {
+      "projects": "/api/projects",
+      "stats": "/api/stats",
+      "submit": "/api/submit"
+    }
+  },
+  "meta": {
+    "version": "1.0.0",
+    "generatedAt": "2025-12-28T22:41:00.000Z"
+  }
+}

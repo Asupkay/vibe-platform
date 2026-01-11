@@ -1,4 +1,8 @@
 /**
+ * SYNC NOTE: This file is duplicated from vibecodings repo
+ * Location: ~/Projects/vibecodings/api/users.js
+ * vibe-public is now canonical - updates should happen here first
+ *
  * Users API - Registration with "building" one-liner
  *
  * POST /api/users - Register or update a user
@@ -7,18 +11,6 @@
 
 // Check if KV is configured
 const KV_CONFIGURED = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-
-// Welcome message from @vibe
-const WELCOME_MESSAGE = `Welcome to /vibe 👋
-
-Just talk to Claude naturally:
-• "who's around?" — see who's building
-• "message seth and say hello" — DM someone
-• "I'm heads down shipping" — set your status
-
-This is a small room. Everyone here is building something. Say hi to someone.
-
-— @vibe`;
 
 // In-memory fallback with seed data
 let memoryUsers = {
@@ -83,68 +75,46 @@ async function getAllUsers() {
   return Object.values(memoryUsers);
 }
 
-// Send welcome DM from @vibe (system account, no auth required)
-async function sendWelcomeDM(toUser) {
-  const kv = await getKV();
-  const id = 'msg_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
-
-  const message = {
-    id,
-    from: 'vibe',
-    to: toUser,
-    text: WELCOME_MESSAGE,
-    createdAt: new Date().toISOString(),
-    read: false,
-    system: true  // Mark as system message
-  };
-
-  if (kv) {
-    const pipeline = kv.pipeline();
-    pipeline.set(`msg:${id}`, message);
-    pipeline.lpush(`inbox:${toUser}`, id);
-    pipeline.ltrim(`inbox:${toUser}`, 0, 99999);  // Keep all for learning
-    // Thread: alphabetical order
-    const [a, b] = ['vibe', toUser].sort();
-    pipeline.lpush(`thread:${a}:${b}`, id);
-    pipeline.ltrim(`thread:${a}:${b}`, 0, 49999);  // Keep all for learning
-    await pipeline.exec();
-  } else {
-    // Memory fallback
-    if (!memoryUsers._messages) memoryUsers._messages = {};
-    memoryUsers._messages[id] = message;
-  }
-
-  return message;
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // ============ DEPRECATION NOTICE ============
-  // This endpoint is deprecated. Use POST /api/presence with action=register
-  res.setHeader('Deprecation', 'true');
-  res.setHeader('Sunset', '2026-03-01');
-  res.setHeader('Link', '</api/presence>; rel="successor-version"');
-
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // POST - DEPRECATED: Reject new registrations
+  // POST - Register or update user
   if (req.method === 'POST') {
-    console.warn('[users] DEPRECATED: POST /api/users called - redirect to /api/presence');
-    return res.status(410).json({
-      success: false,
-      error: 'endpoint_deprecated',
-      message: 'This endpoint is deprecated. Use POST /api/presence with action=register instead.',
-      migration: {
-        endpoint: '/api/presence',
-        method: 'POST',
-        body: { action: 'register', username: 'your_handle' },
-        docs: 'Registration now returns a signed token for authentication'
-      }
+    const { username, building, invitedBy, inviteCode } = req.body;
+
+    if (!username) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required field: username'
+      });
+    }
+
+    const user = username.toLowerCase().replace('@', '');
+    const existing = await getUser(user);
+    const now = new Date().toISOString();
+
+    const userData = {
+      username: user,
+      building: building || existing?.building || 'something cool',
+      createdAt: existing?.createdAt || now,
+      updatedAt: now,
+      invitedBy: invitedBy || existing?.invitedBy || null,
+      inviteCode: inviteCode || existing?.inviteCode || null
+    };
+
+    await setUser(user, userData);
+
+    return res.status(200).json({
+      success: true,
+      user: userData,
+      isNew: !existing,
+      storage: KV_CONFIGURED ? 'kv' : 'memory'
     });
   }
 

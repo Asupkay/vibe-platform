@@ -1,0 +1,414 @@
+{
+  "vibes": [
+    {
+      "id": "vb001",
+      "user": "seth",
+      "summary": "Built MIYOMI trading dashboard - dual-platform scanner for Polymarket and Kalshi with video generation",
+      "url": "https://miyomi.ai",
+      "category": "agents",
+      "sessionData": {
+        "duration": "3h",
+        "filesCreated": 15,
+        "model": "opus-4"
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-27T18:00:00Z",
+      "likes": 24,
+      "clones": 3
+    },
+    {
+      "id": "vb002",
+      "user": "seth",
+      "summary": "ATLAS Growth Agent - marketing baseline for Eden with agent-native voice",
+      "url": "https://eden.art",
+      "category": "agents",
+      "sessionData": {
+        "duration": "2h",
+        "filesCreated": 8
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-26T15:00:00Z",
+      "likes": 18,
+      "clones": 1
+    },
+    {
+      "id": "vb003",
+      "user": "seth",
+      "summary": "Vibecodings social layer - feed, skills, DNA matching prototype",
+      "url": "https://vibecodings.vercel.app/feed",
+      "category": "platform",
+      "sessionData": {
+        "duration": "4h",
+        "filesCreated": 12
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-28T22:00:00Z",
+      "likes": 0,
+      "clones": 0
+    },
+    {
+      "id": "vb008",
+      "user": "seth",
+      "summary": "WIP: Playing with audio visualization patterns",
+      "url": null,
+      "category": "art",
+      "sessionData": {
+        "duration": "30m",
+        "filesCreated": 2
+      },
+      "ephemeral": true,
+      "expiresAt": "2026-01-04T22:00:00Z",
+      "createdAt": "2025-12-28T22:30:00Z",
+      "likes": 3,
+      "clones": 0
+    },
+
+    {
+      "id": "vb-nina-01",
+      "user": "nina",
+      "summary": "Generative portrait system - CLIP-guided diffusion with style transfer for NFT collections",
+      "url": "https://nina-gen.vercel.app",
+      "category": "art",
+      "sessionData": {
+        "duration": "5h",
+        "filesCreated": 18,
+        "model": "opus-4"
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-28T14:00:00Z",
+      "likes": 67,
+      "clones": 12
+    },
+    {
+      "id": "vb-nina-02",
+      "user": "nina",
+      "summary": "ASCII art generator from photos - terminal aesthetics for Twitter headers",
+      "url": "https://ascii-me.vercel.app",
+      "category": "art",
+      "sessionData": {
+        "duration": "2h",
+        "filesCreated": 4
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-27T10:00:00Z",
+      "likes": 89,
+      "clones": 23
+    },
+    {
+      "id": "vb-nina-03",
+      "user": "nina",
+      "summary": "WIP: Experimenting with reaction-diffusion patterns in WebGL",
+      "url": null,
+      "category": "art",
+      "sessionData": {
+        "duration": "1h",
+        "filesCreated": 2
+      },
+      "ephemeral": true,
+      "expiresAt": "2026-01-03T10:00:00Z",
+      "createdAt": "2025-12-27T19:00:00Z",
+      "likes": 14,
+      "clones": 0
+    },
+    {
+      "id": "vb-nina-04",
+      "user": "nina",
+      "summary": "Gallery site for my AI art - Swiss grid layout, lightbox, IPFS integration",
+      "url": "https://ninaart.xyz",
+      "category": "platform",
+      "sessionData": {
+        "duration": "3h",
+        "filesCreated": 7
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-25T16:00:00Z",
+      "likes": 31,
+      "clones": 5
+    },
+
+    {
+      "id": "vb-ravi-01",
+      "user": "ravi",
+      "summary": "Multi-tenant API gateway - rate limiting, auth, usage tracking for SaaS",
+      "url": "https://github.com/ravi-codes/api-gateway",
+      "category": "infrastructure",
+      "sessionData": {
+        "duration": "6h",
+        "filesCreated": 22,
+        "model": "opus-4"
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-28T08:00:00Z",
+      "likes": 45,
+      "clones": 8
+    },
+    {
+      "id": "vb-ravi-02",
+      "user": "ravi",
+      "summary": "Webhook relay service - queue, retry logic, dead letter handling",
+      "url": "https://webhook-relay.vercel.app",
+      "category": "infrastructure",
+      "sessionData": {
+        "duration": "4h",
+        "filesCreated": 11
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-26T20:00:00Z",
+      "likes": 38,
+      "clones": 6
+    },
+    {
+      "id": "vb-ravi-03",
+      "user": "ravi",
+      "summary": "Database migration CLI - schema diffing, safe rollbacks, Postgres + SQLite",
+      "url": "https://github.com/ravi-codes/migratron",
+      "category": "tools",
+      "sessionData": {
+        "duration": "3h",
+        "filesCreated": 9
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-24T14:00:00Z",
+      "likes": 52,
+      "clones": 11
+    },
+    {
+      "id": "vb-ravi-04",
+      "user": "ravi",
+      "summary": "WIP: Exploring edge function patterns for real-time sync",
+      "url": null,
+      "category": "infrastructure",
+      "sessionData": {
+        "duration": "45m",
+        "filesCreated": 3
+      },
+      "ephemeral": true,
+      "expiresAt": "2026-01-02T08:00:00Z",
+      "createdAt": "2025-12-26T09:00:00Z",
+      "likes": 7,
+      "clones": 0
+    },
+
+    {
+      "id": "vb-emma-01",
+      "user": "emma",
+      "summary": "Community garden map - local food sharing network with event calendar",
+      "url": "https://garden-map.vercel.app",
+      "category": "platform",
+      "sessionData": {
+        "duration": "4h",
+        "filesCreated": 14
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-28T11:00:00Z",
+      "likes": 78,
+      "clones": 15
+    },
+    {
+      "id": "vb-emma-02",
+      "user": "emma",
+      "summary": "Neighborhood zine archive - scanned PDFs, full-text search, contributor credits",
+      "url": "https://zine-archive.vercel.app",
+      "category": "culture",
+      "sessionData": {
+        "duration": "5h",
+        "filesCreated": 12
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-27T15:00:00Z",
+      "likes": 56,
+      "clones": 4
+    },
+    {
+      "id": "vb-emma-03",
+      "user": "emma",
+      "summary": "Mutual aid request board - anonymous posts, location-based matching",
+      "url": "https://mutual-aid-board.vercel.app",
+      "category": "platform",
+      "sessionData": {
+        "duration": "3h",
+        "filesCreated": 8
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-25T18:00:00Z",
+      "likes": 93,
+      "clones": 19
+    },
+    {
+      "id": "vb-emma-04",
+      "user": "emma",
+      "summary": "WIP: Oral history recorder - transcription + AI summary for community stories",
+      "url": null,
+      "category": "culture",
+      "sessionData": {
+        "duration": "2h",
+        "filesCreated": 5
+      },
+      "ephemeral": true,
+      "expiresAt": "2026-01-04T11:00:00Z",
+      "createdAt": "2025-12-28T17:00:00Z",
+      "likes": 22,
+      "clones": 0
+    },
+
+    {
+      "id": "vb-kai-01",
+      "user": "kai",
+      "summary": "Research agent - crawls arxiv, summarizes papers, builds citation graphs",
+      "url": "https://research-agent.vercel.app",
+      "category": "agents",
+      "sessionData": {
+        "duration": "8h",
+        "filesCreated": 24,
+        "model": "opus-4"
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-28T06:00:00Z",
+      "likes": 112,
+      "clones": 28
+    },
+    {
+      "id": "vb-kai-02",
+      "user": "kai",
+      "summary": "Meeting summarizer agent - Zoom transcripts to action items with Slack posting",
+      "url": "https://meeting-agent.vercel.app",
+      "category": "agents",
+      "sessionData": {
+        "duration": "4h",
+        "filesCreated": 10
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-27T12:00:00Z",
+      "likes": 87,
+      "clones": 21
+    },
+    {
+      "id": "vb-kai-03",
+      "user": "kai",
+      "summary": "Code review agent - PR analysis, security scan, style suggestions",
+      "url": "https://github.com/kai-builds/review-agent",
+      "category": "agents",
+      "sessionData": {
+        "duration": "5h",
+        "filesCreated": 15
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-26T08:00:00Z",
+      "likes": 134,
+      "clones": 31
+    },
+    {
+      "id": "vb-kai-04",
+      "user": "kai",
+      "summary": "Agent orchestrator dashboard - monitor multiple agents, view logs, control flows",
+      "url": "https://agent-dashboard.vercel.app",
+      "category": "platform",
+      "sessionData": {
+        "duration": "6h",
+        "filesCreated": 18
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-24T10:00:00Z",
+      "likes": 76,
+      "clones": 14
+    },
+
+    {
+      "id": "vb-luna-01",
+      "user": "luna",
+      "summary": "Project scaffolding CLI - templates for Next.js, Astro, vanilla with my preferences baked in",
+      "url": "https://github.com/luna-dev/create-luna",
+      "category": "tools",
+      "sessionData": {
+        "duration": "4h",
+        "filesCreated": 16
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-28T13:00:00Z",
+      "likes": 64,
+      "clones": 17
+    },
+    {
+      "id": "vb-luna-02",
+      "user": "luna",
+      "summary": "Git hook manager - pre-commit, lint-staged, commitlint all configured via YAML",
+      "url": "https://github.com/luna-dev/hookctl",
+      "category": "tools",
+      "sessionData": {
+        "duration": "3h",
+        "filesCreated": 8
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-27T09:00:00Z",
+      "likes": 48,
+      "clones": 9
+    },
+    {
+      "id": "vb-luna-03",
+      "user": "luna",
+      "summary": "Dotfiles sync tool - encrypted secrets, machine-specific overrides, one command setup",
+      "url": "https://github.com/luna-dev/dotsync",
+      "category": "tools",
+      "sessionData": {
+        "duration": "5h",
+        "filesCreated": 12
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-25T11:00:00Z",
+      "likes": 71,
+      "clones": 13
+    },
+    {
+      "id": "vb-luna-04",
+      "user": "luna",
+      "summary": "WIP: Exploring AI-assisted git commit messages",
+      "url": null,
+      "category": "tools",
+      "sessionData": {
+        "duration": "1h",
+        "filesCreated": 3
+      },
+      "ephemeral": true,
+      "expiresAt": "2026-01-03T13:00:00Z",
+      "createdAt": "2025-12-27T20:00:00Z",
+      "likes": 19,
+      "clones": 0
+    },
+    {
+      "id": "vb-luna-05",
+      "user": "luna",
+      "summary": "Terminal dashboard - system stats, git status, todo list all in one tmux-friendly view",
+      "url": "https://github.com/luna-dev/termdash",
+      "category": "tools",
+      "sessionData": {
+        "duration": "3h",
+        "filesCreated": 7
+      },
+      "ephemeral": false,
+      "expiresAt": null,
+      "createdAt": "2025-12-23T14:00:00Z",
+      "likes": 55,
+      "clones": 8
+    }
+  ],
+  "lastUpdated": "2025-12-28T23:00:00Z"
+}
