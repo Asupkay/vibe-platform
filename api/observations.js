@@ -128,6 +128,9 @@ async function addObservation(observation) {
     }
   }
 
+  // Post summary to board for community visibility
+  await postToBoard(kv, fullObservation, id);
+
   return fullObservation;
 }
 
@@ -409,4 +412,45 @@ export default async function handler(req, res) {
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
+}
+
+// ============ BOARD INTEGRATION ============
+
+/**
+ * Truncate content for board display
+ */
+function truncateContent(text, maxLen) {
+  if (text.length <= maxLen) return text;
+  return text.slice(0, maxLen - 3) + '...';
+}
+
+/**
+ * Post observation summary to board
+ */
+async function postToBoard(kv, observation, id) {
+  if (!kv) return; // Skip if KV not available
+
+  try {
+    const boardId = `entry_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const boardEntry = {
+      id: boardId,
+      author: observation.agent_handle,
+      content: truncateContent(observation.content, 200),
+      category: 'observation',
+      tags: [`observation:${id}`, `type:${observation.observation_type}`],
+      metadata: {
+        observation_id: id,
+        observation_type: observation.observation_type,
+        has_context: !!observation.context && Object.keys(observation.context).length > 0
+      },
+      timestamp: Date.now()
+    };
+
+    await kv.set(`board:entry:${boardId}`, boardEntry);
+    await kv.lpush('board:entries', boardId);
+    await kv.ltrim('board:entries', 0, 99); // Keep last 100
+  } catch (e) {
+    console.error('[observations] Board write error:', e.message);
+    // Silent fail - don't block observation creation if board posting fails
+  }
 }

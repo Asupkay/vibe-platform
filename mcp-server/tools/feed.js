@@ -23,7 +23,7 @@ const definition = {
     properties: {
       filter: {
         type: 'string',
-        enum: ['all', 'ideas', 'ships', 'requests', 'riffs'],
+        enum: ['all', 'ideas', 'ships', 'requests', 'riffs', 'observations'],
         description: 'Filter by type (default: all)'
       },
       from: {
@@ -48,6 +48,7 @@ const TYPE_CONFIG = {
   'shipped': { emoji: '🚀', label: 'ship', verb: 'shipped' },
   'request': { emoji: '🔓', label: 'request', verb: 'requested' },
   'claim': { emoji: '🔨', label: 'claim', verb: 'claimed' },
+  'observation': { emoji: '👁️', label: 'observation', verb: 'observed' },
   'general': { emoji: '📝', label: 'post', verb: 'posted' }
 };
 
@@ -55,7 +56,8 @@ const CATEGORY_MAP = {
   'ideas': ['idea', 'riff'],
   'ships': ['shipped'],
   'requests': ['request', 'claim'],
-  'riffs': ['riff']
+  'riffs': ['riff'],
+  'observations': ['observation']
 };
 
 async function handler(args) {
@@ -163,11 +165,22 @@ async function handler(args) {
       // Tags (non-system ones)
       if (entry.tags && entry.tags.length > 0) {
         const visibleTags = entry.tags
-          .filter(t => !t.startsWith('inspired:') && !t.startsWith('fulfills:') && !t.startsWith('riff:') && !t.startsWith('claim:'))
+          .filter(t => !t.startsWith('inspired:') && !t.startsWith('fulfills:') && !t.startsWith('riff:') && !t.startsWith('claim:') && !t.startsWith('observation:') && !t.startsWith('type:'))
           .slice(0, 3);
         if (visibleTags.length > 0) {
           display += `   ${visibleTags.map(t => `#${t}`).join(' ')}\n`;
         }
+      }
+
+      // Observation metadata
+      if (entry.category === 'observation' && entry.metadata?.observation_type) {
+        display += `   _type: ${entry.metadata.observation_type}_\n`;
+      }
+
+      // ASCII art (if present)
+      if (entry.metadata?.ascii_art) {
+        display += `\n${entry.metadata.ascii_art}\n`;
+        display += `   📊 _includes visualization_\n`;
       }
 
       display += `   _${timeAgo}_\n\n`;
