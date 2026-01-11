@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-01-11T06:08:57.530Z",
+  "totalTasks": 5,
+  "completed": 5,
+  "downloaded": 5,
+  "images": [
+    {
+      "id": "bk8bBjokPSWQS2wKkKXMCq",
+      "name": "complete-system",
+      "fileName": "economic-layer-complete-system.png",
+      "description": "All 5 layers with flow arrows and flywheel",
+      "useCase": "README hero image, social sharing, presentations",
+      "status": "completed",
+      "downloaded": true,
+      "fileSize": 5629284,
+      "manusUrl": "https://manus.im/app/bk8bBjokPSWQS2wKkKXMCq"
+    },
+    {
+      "id": "aLQPEXTFtWP8iqeWf7Fjxu",
+      "name": "flywheel",
+      "fileName": "economic-layer-flywheel.png",
+      "description": "Large circular diagram showing value flow cycle",
+      "useCase": "Social posts highlighting network effects",
+      "status": "completed",
+      "downloaded": true,
+      "fileSize": 5185835,
+      "manusUrl": "https://manus.im/app/aLQPEXTFtWP8iqeWf7Fjxu"
+    },
+    {
+      "id": "QxoPj8bMmCFcaDE6jCVMCk",
+      "name": "payments",
+      "fileName": "economic-layer-payments.png",
+      "description": "Transaction flow and smart contracts",
+      "useCase": "Technical documentation for payment infrastructure",
+      "status": "completed",
+      "downloaded": true,
+      "fileSize": 5702335,
+      "manusUrl": "https://manus.im/app/QxoPj8bMmCFcaDE6jCVMCk"
+    },
+    {
+      "id": "KHcJcrA6ydGD42peY7ricd",
+      "name": "reputation-tiers",
+      "fileName": "economic-layer-reputation-tiers.png",
+      "description": "Vertical tier progression from Genesis to Diamond",
+      "useCase": "Gamification and tier system explanation",
+      "status": "completed",
+      "downloaded": true,
+      "fileSize": 5733155,
+      "manusUrl": "https://manus.im/app/KHcJcrA6ydGD42peY7ricd"
+    },
+    {
+      "id": "D6aaEm2yFQBAsGQvUhJag3",
+      "name": "genesis-liquidity",
+      "fileName": "economic-layer-genesis-liquidity.png",
+      "description": "20% MAX APY and optimal strategy",
+      "useCase": "Liquidity mining marketing materials",
+      "status": "completed",
+      "downloaded": true,
+      "fileSize": 5880393,
+      "manusUrl": "https://manus.im/app/D6aaEm2yFQBAsGQvUhJag3"
+    }
+  ]
+}
