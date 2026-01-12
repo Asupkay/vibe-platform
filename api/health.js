@@ -94,13 +94,22 @@ export default async function handler(req, res) {
       health.checks.postgres = { status: 'not_configured' };
     }
 
-    // Get user stats
+    // Get user stats from vibe:handles (the canonical source)
     try {
-      const users = await kv.keys('user:*');
+      // Primary: vibe:handles hash (proper handle registry)
+      const handleCount = await kv.hlen('vibe:handles');
+      // Legacy: user:* keys (old system, for reference)
+      const legacyUsers = await kv.keys('user:*');
       const tips = await kv.llen('tips:global') || 0;
+
       health.stats = {
-        registeredUsers: users.length,
-        totalTips: tips
+        registeredHandles: handleCount,
+        legacyUsers: legacyUsers.length,
+        totalTips: tips,
+        genesisRemaining: 100 - handleCount,
+        note: handleCount < legacyUsers.length
+          ? 'Migration needed: some legacy users not in handles registry'
+          : null
       };
     } catch (e) {
       health.stats = { error: e.message };

@@ -7,7 +7,19 @@
  *
  * POST /api/users - Register or update a user
  * GET /api/users?user=X - Get user profile
+ *
+ * IMPORTANT: This now integrates with the handle claiming system (vibe:handles)
+ * to properly track genesis users and enforce handle rules.
  */
+
+import {
+  normalizeHandle,
+  validateHandle,
+  checkReserved,
+  claimHandle,
+  getHandleRecord,
+  getHandleStats
+} from './lib/handles.js';
 
 // Check if KV is configured
 const KV_CONFIGURED = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
@@ -86,7 +98,7 @@ export default async function handler(req, res) {
 
   // POST - Register or update user
   if (req.method === 'POST') {
-    const { username, building, invitedBy, inviteCode } = req.body;
+    const { username, building, invitedBy, inviteCode, publicKey } = req.body;
 
     if (!username) {
       return res.status(400).json({
@@ -95,25 +107,81 @@ export default async function handler(req, res) {
       });
     }
 
-    const user = username.toLowerCase().replace('@', '');
+    const kv = await getKV();
+    const user = normalizeHandle(username);
+
+    // Validate handle format
+    const validation = validateHandle(user);
+    if (!validation.valid) {
+      return res.status(400).json({
+        success: false,
+        error: validation.error
+      });
+    }
+
+    // Check if reserved
+    const reserved = checkReserved(user);
+    if (reserved.reserved) {
+      return res.status(400).json({
+        success: false,
+        error: `Handle is reserved (${reserved.reason})`
+      });
+    }
+
     const existing = await getUser(user);
     const now = new Date().toISOString();
 
+    // If KV is available, also claim in vibe:handles for proper genesis tracking
+    let handleRecord = null;
+    let genesisNumber = null;
+    let isNewHandle = false;
+
+    if (kv) {
+      // Check if handle is already claimed in the handles system
+      handleRecord = await getHandleRecord(kv, user);
+
+      if (!handleRecord) {
+        // Claim handle in the proper handles system
+        const claimResult = await claimHandle(kv, user, {
+          one_liner: building || 'something cool',
+          publicKey: publicKey || null
+        });
+
+        if (claimResult.success) {
+          handleRecord = claimResult.record;
+          genesisNumber = claimResult.genesis_number;
+          isNewHandle = true;
+        }
+        // If claim fails (shouldn't happen after validation), continue with legacy storage
+      }
+    }
+
+    // Also maintain legacy user:{handle} storage for backward compatibility
     const userData = {
       username: user,
       building: building || existing?.building || 'something cool',
       createdAt: existing?.createdAt || now,
       updatedAt: now,
       invitedBy: invitedBy || existing?.invitedBy || null,
-      inviteCode: inviteCode || existing?.inviteCode || null
+      inviteCode: inviteCode || existing?.inviteCode || null,
+      publicKey: publicKey || existing?.publicKey || null
     };
 
     await setUser(user, userData);
+
+    // Get current handle stats
+    let handleStats = null;
+    if (kv) {
+      handleStats = await getHandleStats(kv);
+    }
 
     return res.status(200).json({
       success: true,
       user: userData,
       isNew: !existing,
+      isNewHandle,
+      genesisNumber,
+      handleStats,
       storage: KV_CONFIGURED ? 'kv' : 'memory'
     });
   }
