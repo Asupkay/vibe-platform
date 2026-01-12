@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(vercel env:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(timeout 5 node:*)",
+      "Bash(echo:*)",
+      "Bash(pnpm add:*)",
+      "Bash(xargs:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git restore:*)",
+      "Bash(node -e:*)"
+    ]
+  }
+}
