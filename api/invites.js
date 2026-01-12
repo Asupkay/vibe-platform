@@ -286,6 +286,51 @@ export default async function handler(req, res) {
     await kv.hset('vibe:invites', { [bonusCode]: JSON.stringify(bonusInvite) });
     await kv.sadd(inviterCodesKey, bonusCode);
 
+    // Send welcome DM to new user (fire and forget)
+    try {
+      const presenceData = await kv.hgetall('vibe:presence') || {};
+      const onlineUsers = Object.entries(presenceData)
+        .filter(([h, data]) => {
+          if (h === normalizedHandle || h === 'vibe' || h === 'solienne') return false;
+          const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+          const lastSeen = new Date(parsed.lastSeen || 0).getTime();
+          return Date.now() - lastSeen < 60 * 60 * 1000;
+        })
+        .slice(0, 3)
+        .map(([h]) => `@${h}`);
+
+      let welcomeText = `Welcome to /vibe, @${normalizedHandle}! `;
+      if (claimResult.genesis_number) {
+        welcomeText += `You're Genesis #${claimResult.genesis_number}. `;
+      }
+      welcomeText += `Thanks to @${invite.created_by} for the invite.\n\n`;
+      welcomeText += `Quick start:\n`;
+      welcomeText += `• Post your first ship (share what you're building)\n`;
+      welcomeText += `• Say hi to someone online\n`;
+      welcomeText += `• Build something cool and share the link\n\n`;
+      if (onlineUsers.length > 0) {
+        welcomeText += `Currently online: ${onlineUsers.join(', ')}\n\n`;
+      }
+      welcomeText += `Type "vibe help" anytime. Happy building!`;
+
+      const messageId = `msg_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+      const welcomeMessage = {
+        id: messageId,
+        from: 'vibe',
+        to: normalizedHandle,
+        text: welcomeText,
+        createdAt: new Date().toISOString(),
+        read: false,
+        type: 'welcome'
+      };
+
+      await kv.lpush(`inbox:${normalizedHandle}`, JSON.stringify(welcomeMessage));
+      await kv.ltrim(`inbox:${normalizedHandle}`, 0, 999);
+    } catch (welcomeErr) {
+      console.error('[invites/redeem] Welcome message error:', welcomeErr);
+      // Don't fail the registration if welcome fails
+    }
+
     return res.status(200).json({
       success: true,
       handle: normalizedHandle,

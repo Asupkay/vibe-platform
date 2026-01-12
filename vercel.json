@@ -54,6 +54,7 @@
     { "source": "/api/growth/leaderboard", "destination": "/api/growth/leaderboard.js" },
     { "source": "/api/growth/streak", "destination": "/api/growth/streak.js" },
     { "source": "/api/gigabrain/ingest", "destination": "/api/gigabrain/ingest.js" },
+    { "source": "/api/onboarding/welcome", "destination": "/api/onboarding/welcome.js" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/docs", "destination": "/docs.html" },
     { "source": "/chronicle", "destination": "/chronicle.html" },
@@ -64,6 +65,8 @@
     { "source": "/alpha", "destination": "/alpha.html" },
     { "source": "/why-invites", "destination": "/why-invites.html" },
     { "source": "/history", "destination": "/history.html" },
+    { "source": "/arc", "destination": "/arc.html" },
+    { "source": "/internal", "destination": "/internal.html" },
     { "source": "/vibe-icon.png", "destination": "/public/vibe-icon.png" }
   ]
 }
