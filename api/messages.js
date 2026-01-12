@@ -95,8 +95,14 @@ export default async function handler(req, res) {
       read: false
     };
 
-    const messages = await getMessages();
+    let messages = await getMessages();
     messages.push(message);
+
+    // Keep only last 10000 messages to prevent unbounded growth
+    if (messages.length > 10000) {
+      messages = messages.slice(-10000);
+    }
+
     await saveMessages(messages);
 
     return res.status(200).json({

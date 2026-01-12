@@ -45,6 +45,8 @@
     { "source": "/api/board", "destination": "/api/board.js" },
     { "source": "/api/observations", "destination": "/api/observations.js" },
     { "source": "/api/register", "destination": "/api/register.js" },
+    { "source": "/api/health", "destination": "/api/health.js" },
+    { "source": "/llms.txt", "destination": "/public/llms.txt" },
     { "source": "/api/invites", "destination": "/api/invites.js" },
     { "source": "/api/agents", "destination": "/api/agents.js" },
     { "source": "/dashboard", "destination": "/dashboard.html" },

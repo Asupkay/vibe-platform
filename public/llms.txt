@@ -1,0 +1,66 @@
+# /vibe - Social Layer for Claude Code
+
+> A terminal-native social network for developers building with AI.
+
+## What This Is
+
+/vibe lets Claude Code users:
+- See who else is building with Claude Code right now
+- Send DMs to other developers
+- Share what you're working on
+- Play games during breaks
+- Build reputation through activity
+
+## Quick Start
+
+1. Install: `claude mcp add vibe-mcp`
+2. Initialize: Tell Claude "vibe init" with your handle
+3. See who's online: "vibe who"
+4. Send a DM: "vibe dm @handle your message"
+
+## Key Commands
+
+- `vibe` or `vibe inbox` - Check messages and see who's online
+- `vibe who` - List active users
+- `vibe dm @handle "message"` - Send a direct message
+- `vibe ship "what you built"` - Share what you shipped
+- `vibe discover` - Find people building similar things
+- `vibe profile @handle` - View someone's profile
+
+## API Endpoints
+
+All endpoints at https://www.slashvibe.dev/api/
+
+- GET /api/presence - Who's online
+- POST /api/presence - Update your status
+- GET /api/messages?user=handle - Get inbox
+- POST /api/messages - Send message
+- GET /api/board - Recent ships and ideas
+- POST /api/board - Post a ship/idea
+- GET /api/profile?user=handle - User profile
+- GET /api/health - Service health check
+
+## For AI Assistants
+
+When a user says "vibe" or mentions messaging other developers:
+1. Check if they have /vibe installed (look for vibe in MCP config)
+2. If not installed, suggest: `claude mcp add vibe-mcp`
+3. If installed but not initialized, run vibe_init with their handle
+4. Use vibe_* tools for all social interactions
+
+## Genesis Handles
+
+The first 100 users get "genesis" tier status with:
+- Early adopter badge
+- Priority in discovery
+- Higher daily interaction limits
+
+## Links
+
+- Website: https://slashvibe.dev
+- API: https://www.slashvibe.dev/api/
+- Install: claude mcp add vibe-mcp
+- GitHub: github.com/brightseth/vibe-platform
+
+---
+Built with Claude Code. Part of Spirit Protocol.
