@@ -1,5 +1,40 @@
 # /vibe Vision: AI-Native Social Services Platform
 
+## The Core Truth
+
+> **/vibe is the canonical identity + memory graph for people building with Claude Code.**
+
+Your handle. Your ships. Your connections. Your patterns. Your reputation. All persistent across sessions, machines, and time.
+
+### The Identity Layer
+```
+@handle           → Your universal AI-native identity
+├── Profile       → Who you are, what you build
+├── Ships         → What you've created (with share cards)
+├── Streaks       → Your building rhythm
+├── Reputation    → Trust score from activity
+├── Connections   → Who you know, who knows you
+└── Memory        → What Claude remembers about you
+```
+
+### The Memory Graph
+```
+Sessions          → Every coding session, captured
+├── Commands      → What you ran
+├── Context       → What you were building
+├── Collaborators → Who you worked with
+├── Artifacts     → What you produced
+└── Learnings     → Patterns Claude noticed
+```
+
+### Why This Matters
+- **Continuity**: Pick up where you left off, any machine
+- **Reputation**: Portable proof of what you've built
+- **Discovery**: Find people building similar things
+- **AI Context**: Claude knows your history, preferences, style
+
+---
+
 ## The Big Idea
 
 /vibe starts as social layer for Claude Code users, but expands into a **general-purpose AI-native social network** where any service can be accessed through conversation.
