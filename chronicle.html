@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>/vibe Chronicle</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'SF Mono', Monaco, monospace;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { color: #6B8FFF; margin-bottom: 0.5rem; }
+    .subtitle { color: #888; margin-bottom: 2rem; }
+    .ship {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .ship-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+    .ship-author {
+      color: #6B8FFF;
+      font-weight: 600;
+    }
+    .ship-time {
+      color: #666;
+      font-size: 0.875rem;
+    }
+    .ship-content {
+      line-height: 1.6;
+      margin-bottom: 0.75rem;
+    }
+    .ship-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: #666;
+    }
+    .ship-type {
+      background: #2a2a4e;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      color: #6B8FFF;
+    }
+    .loading { color: #888; text-align: center; padding: 2rem; }
+    .error { color: #f87171; text-align: center; padding: 2rem; }
+    a { color: #6B8FFF; }
+    .nav { margin-bottom: 2rem; }
+    .nav a { margin-right: 1rem; }
+    .empty { color: #666; text-align: center; padding: 3rem; }
+    .share-link {
+      color: #4ade80;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+    .share-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <a href="/">Home</a>
+      <a href="/status">Status</a>
+      <a href="/leaderboard">Leaderboard</a>
+    </div>
+    <h1>/vibe Chronicle</h1>
+    <p class="subtitle">What builders are shipping</p>
+    <div id="chronicle">
+      <div class="loading">Loading ships...</div>
+    </div>
+  </div>
+  <script>
+    function timeAgo(date) {
+      const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+      if (seconds < 60) return 'just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      return `${days}d ago`;
+    }
+
+    async function loadChronicle() {
+      try {
+        const res = await fetch('https://www.slashvibe.dev/api/board');
+        const data = await res.json();
+
+        if (!data.entries || data.entries.length === 0) {
+          document.getElementById('chronicle').innerHTML = '<div class="empty">No ships yet. Be the first to share what you\'re building!</div>';
+          return;
+        }
+
+        // Sort by timestamp descending
+        const ships = data.entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        let html = '';
+        for (const ship of ships) {
+          const shareUrl = ship.shareUrl || `https://slashvibe.dev/api/share/${ship.id}`;
+          html += `
+            <div class="ship">
+              <div class="ship-header">
+                <span class="ship-author">@${ship.author || 'anonymous'}</span>
+                <span class="ship-time">${timeAgo(ship.timestamp)}</span>
+              </div>
+              <div class="ship-content">${escapeHtml(ship.content)}</div>
+              <div class="ship-meta">
+                <span class="ship-type">${ship.type || 'ship'}</span>
+                ${ship.url ? `<a href="${ship.url}" target="_blank">View</a>` : ''}
+                <a href="${shareUrl}" class="share-link" target="_blank">Share</a>
+              </div>
+            </div>
+          `;
+        }
+
+        document.getElementById('chronicle').innerHTML = html;
+      } catch (e) {
+        document.getElementById('chronicle').innerHTML = `<div class="error">Error loading chronicle: ${e.message}</div>`;
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    loadChronicle();
+    setInterval(loadChronicle, 60000); // Refresh every minute
+  </script>
+</body>
+</html>

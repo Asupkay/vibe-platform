@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>/vibe Status</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'SF Mono', Monaco, monospace;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { color: #6B8FFF; margin-bottom: 1rem; }
+    .status-card {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #333;
+    }
+    .status-row:last-child { border-bottom: none; }
+    .healthy { color: #4ade80; }
+    .unhealthy { color: #f87171; }
+    .stats { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #333; }
+    .loading { color: #888; }
+    a { color: #6B8FFF; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>/vibe Status</h1>
+    <div class="status-card" id="health">
+      <div class="loading">Loading...</div>
+    </div>
+    <p><a href="/">Back to home</a></p>
+  </div>
+  <script>
+    async function loadHealth() {
+      try {
+        const res = await fetch('https://www.slashvibe.dev/api/health?full=true');
+        const data = await res.json();
+
+        let html = `
+          <div class="status-row">
+            <span>Overall</span>
+            <span class="${data.status === 'healthy' ? 'healthy' : 'unhealthy'}">${data.status.toUpperCase()}</span>
+          </div>
+        `;
+
+        for (const [name, check] of Object.entries(data.checks || {})) {
+          html += `
+            <div class="status-row">
+              <span>${name}</span>
+              <span class="${check.status === 'healthy' ? 'healthy' : 'unhealthy'}">
+                ${check.status} ${check.latency ? `(${check.latency}ms)` : ''}
+              </span>
+            </div>
+          `;
+        }
+
+        if (data.stats) {
+          html += `
+            <div class="stats">
+              <div class="status-row"><span>Registered Handles</span><span>${data.stats.registeredHandles || 0}</span></div>
+              <div class="status-row"><span>Genesis Remaining</span><span>${data.stats.genesisRemaining || 0}</span></div>
+            </div>
+          `;
+        }
+
+        html += `<div style="margin-top:1rem;color:#666;font-size:0.875rem;">Updated: ${data.timestamp}</div>`;
+
+        document.getElementById('health').innerHTML = html;
+      } catch (e) {
+        document.getElementById('health').innerHTML = `<div class="unhealthy">Error loading status: ${e.message}</div>`;
+      }
+    }
+    loadHealth();
+    setInterval(loadHealth, 30000);
+  </script>
+</body>
+</html>

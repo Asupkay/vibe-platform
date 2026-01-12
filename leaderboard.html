@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>/vibe Leaderboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'SF Mono', Monaco, monospace;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { color: #6B8FFF; margin-bottom: 0.5rem; }
+    .subtitle { color: #888; margin-bottom: 2rem; }
+    .leaderboard {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .leader-row {
+      display: grid;
+      grid-template-columns: 50px 1fr 100px 80px;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #333;
+      align-items: center;
+    }
+    .leader-row:last-child { border-bottom: none; }
+    .leader-row:hover { background: #222244; }
+    .leader-header {
+      background: #0a0a1a;
+      font-weight: 600;
+      color: #888;
+    }
+    .rank {
+      font-weight: 700;
+      color: #6B8FFF;
+    }
+    .rank-1 { color: #ffd700; }
+    .rank-2 { color: #c0c0c0; }
+    .rank-3 { color: #cd7f32; }
+    .handle {
+      color: #e0e0e0;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+    }
+    .badge-genesis {
+      background: #3b82f6;
+      color: white;
+    }
+    .badge-verified {
+      background: #22c55e;
+      color: white;
+    }
+    .badge-dedicated {
+      background: #a855f7;
+      color: white;
+    }
+    .invites { color: #4ade80; text-align: center; }
+    .score { color: #6B8FFF; text-align: right; font-weight: 600; }
+    .loading { color: #888; text-align: center; padding: 2rem; }
+    .error { color: #f87171; text-align: center; padding: 2rem; }
+    a { color: #6B8FFF; }
+    .nav { margin-bottom: 2rem; }
+    .nav a { margin-right: 1rem; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #6B8FFF;
+    }
+    .stat-label {
+      color: #888;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <a href="/">Home</a>
+      <a href="/status">Status</a>
+      <a href="/chronicle">Chronicle</a>
+    </div>
+    <h1>/vibe Leaderboard</h1>
+    <p class="subtitle">Top builders by growth score</p>
+    <div id="stats" class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="total-users">--</div>
+        <div class="stat-label">Builders</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="genesis-remaining">--</div>
+        <div class="stat-label">Genesis Left</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="total-invites">--</div>
+        <div class="stat-label">Total Invites</div>
+      </div>
+    </div>
+    <div id="leaderboard" class="leaderboard">
+      <div class="loading">Loading leaderboard...</div>
+    </div>
+  </div>
+  <script>
+    async function loadLeaderboard() {
+      try {
+        const res = await fetch('https://www.slashvibe.dev/api/growth/leaderboard');
+        const data = await res.json();
+
+        // Update stats
+        document.getElementById('total-users').textContent = data.totalUsers || '--';
+        document.getElementById('genesis-remaining').textContent = data.genesisRemaining || '--';
+
+        // Calculate total invites
+        const totalInvites = (data.leaderboard || []).reduce((sum, u) => sum + (u.invites || 0), 0);
+        document.getElementById('total-invites').textContent = totalInvites;
+
+        if (!data.leaderboard || data.leaderboard.length === 0) {
+          document.getElementById('leaderboard').innerHTML = '<div class="loading">No builders yet</div>';
+          return;
+        }
+
+        let html = `
+          <div class="leader-row leader-header">
+            <span>#</span>
+            <span>Builder</span>
+            <span style="text-align:center">Invites</span>
+            <span style="text-align:right">Score</span>
+          </div>
+        `;
+
+        data.leaderboard.forEach((user, index) => {
+          const rank = index + 1;
+          const rankClass = rank <= 3 ? `rank-${rank}` : '';
+
+          let badges = '';
+          if (user.isGenesis) badges += '<span class="badge badge-genesis">Genesis</span>';
+          if (user.streakDays >= 30) badges += '<span class="badge badge-dedicated">Dedicated</span>';
+          else if (user.streakDays >= 7) badges += '<span class="badge badge-verified">Verified</span>';
+
+          html += `
+            <div class="leader-row">
+              <span class="rank ${rankClass}">${rank}</span>
+              <span class="handle">@${user.handle}${badges}</span>
+              <span class="invites">${user.invites || 0}</span>
+              <span class="score">${user.growthScore || 0}</span>
+            </div>
+          `;
+        });
+
+        document.getElementById('leaderboard').innerHTML = html;
+      } catch (e) {
+        document.getElementById('leaderboard').innerHTML = `<div class="error">Error loading leaderboard: ${e.message}</div>`;
+      }
+    }
+
+    loadLeaderboard();
+    setInterval(loadLeaderboard, 30000); // Refresh every 30 seconds
+  </script>
+</body>
+</html>
