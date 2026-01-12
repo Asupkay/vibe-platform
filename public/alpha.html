@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>/vibe Terminal - Alpha Access</title>
+    <meta name="description" content="Early access to VIBE Terminal - the social layer for Claude Code.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            padding: 48px 20px;
+        }
+        .container { max-width: 620px; margin: 0 auto; }
+
+        .alpha-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #6B8FFF22, #9B6BFF22);
+            border: 1px solid #6B8FFF55;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: #6B8FFF;
+            margin-bottom: 24px;
+        }
+
+        h1 { font-size: 48px; font-weight: 400; margin-bottom: 8px; letter-spacing: -2px; }
+        .tagline { font-size: 17px; color: #6B8FFF; margin-bottom: 8px; }
+        .sub { font-size: 14px; color: #999; margin-bottom: 32px; line-height: 1.6; }
+
+        .hero-visual {
+            background: linear-gradient(135deg, #0a0a0a 0%, #0d0d15 50%, #0a0a0a 100%);
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-visual::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at center, #6B8FFF08 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #1a1a2e, #0a0a15);
+            border: 2px solid #6B8FFF33;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 48px;
+            box-shadow: 0 8px 32px rgba(107, 143, 255, 0.15);
+        }
+        .version-info {
+            font-size: 12px;
+            color: #888;
+        }
+        .version-info span { color: #6B8FFF; }
+
+        .download-section {
+            background: #0a0a0a;
+            border: 1px solid #6B8FFF33;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .download-title {
+            font-size: 11px;
+            color: #6B8FFF;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        .download-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, #6B8FFF, #5a7de8);
+            border: none;
+            border-radius: 8px;
+            padding: 16px 24px;
+            color: #000;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(107, 143, 255, 0.3);
+        }
+        .download-btn .icon { font-size: 20px; }
+        .download-btn .details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+        .download-btn .details small {
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        .alt-downloads {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .alt-btn {
+            flex: 1;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px 16px;
+            color: #888;
+            font-family: inherit;
+            font-size: 11px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .alt-btn:hover {
+            background: #1a1a1a;
+            border-color: #6B8FFF55;
+            color: #fff;
+        }
+        .alt-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .feature {
+            background: #0a0a0a;
+            border: 1px solid #181818;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .feature-icon { font-size: 20px; margin-bottom: 8px; }
+        .feature-title { font-size: 12px; color: #fff; margin-bottom: 4px; }
+        .feature-desc { font-size: 11px; color: #888; line-height: 1.5; }
+
+        .requirements {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 32px;
+            font-size: 12px;
+            color: #888;
+        }
+        .requirements strong { color: #bbb; }
+
+        .changelog {
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        .changelog-title {
+            font-size: 11px;
+            color: #6B8FFF;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .changelog-item {
+            font-size: 12px;
+            color: #ccc;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .changelog-item:last-child { border-bottom: none; }
+        .changelog-item .tag {
+            display: inline-block;
+            background: #6B8FFF22;
+            color: #6B8FFF;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            margin-right: 8px;
+        }
+
+        .warning {
+            background: #1a1a0a;
+            border: 1px solid #554400;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .warning-icon { font-size: 18px; }
+        .warning-text { font-size: 12px; color: #ccaa00; line-height: 1.6; }
+
+        .footer {
+            font-size: 11px;
+            color: #666;
+            padding-top: 20px;
+            border-top: 1px solid #222;
+        }
+        .footer a { color: #888; text-decoration: none; }
+        .footer a:hover { color: #6B8FFF; }
+
+        @media (max-width: 520px) {
+            body { padding: 32px 16px; }
+            h1 { font-size: 36px; }
+            .features { grid-template-columns: 1fr; }
+            .alt-downloads { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="alpha-badge">EARLY ALPHA ACCESS</div>
+
+        <h1>/vibe Terminal</h1>
+        <p class="tagline">The social layer for Claude Code.</p>
+        <p class="sub">Native terminal app with built-in presence, DMs, session replay, and multiplayer games. For builders who live in the terminal.</p>
+
+        <div class="hero-visual">
+            <div class="app-icon">⚡</div>
+            <div class="version-info">
+                Version <span>0.1.0-alpha</span> &middot; January 2026
+            </div>
+        </div>
+
+        <div class="download-section">
+            <div class="download-title">Download for macOS</div>
+            <a href="#" class="download-btn" id="main-download" onclick="trackDownload('dmg')">
+                <span class="icon"></span>
+                <div class="details">
+                    <span>Download Vibe.dmg</span>
+                    <small>macOS 10.15+ &middot; Apple Silicon & Intel</small>
+                </div>
+                <span style="font-size: 12px; opacity: 0.7;">~45 MB</span>
+            </a>
+
+            <div class="alt-downloads">
+                <a href="#" class="alt-btn" onclick="trackDownload('arm64')">
+                    Apple Silicon (M1/M2/M3)
+                </a>
+                <a href="#" class="alt-btn" onclick="trackDownload('x64')">
+                    Intel (x64)
+                </a>
+                <a href="#" class="alt-btn disabled" title="Coming soon">
+                    Windows (soon)
+                </a>
+            </div>
+        </div>
+
+        <div class="warning">
+            <span class="warning-icon">⚠️</span>
+            <div class="warning-text">
+                <strong>Alpha software.</strong> Things will break. Data may be lost.
+                This is for early testers willing to report bugs and help shape the product.
+                <br><br>
+                To open: Right-click the app → Open (first time requires bypassing Gatekeeper)
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">💬</div>
+                <div class="feature-title">Real-time DMs</div>
+                <div class="feature-desc">Message other vibecoders without leaving your session. Context-aware conversations.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">👀</div>
+                <div class="feature-title">Watch Mode</div>
+                <div class="feature-desc">See what others are building in real-time. Learn by watching experts debug.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎮</div>
+                <div class="feature-title">Terminal Games</div>
+                <div class="feature-desc">Tic-tac-toe, word games, and more. Play with humans and AI agents.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">✨</div>
+                <div class="feature-title">VIBE Mode</div>
+                <div class="feature-desc">Playful UI overlays for Claude prompts. Transform dry dialogs into delightful interactions.</div>
+            </div>
+        </div>
+
+        <div class="changelog">
+            <div class="changelog-title">What's New in 0.1.0</div>
+            <div class="changelog-item">
+                <span class="tag">NEW</span>
+                VIBE personality layer - playful prompt transformations
+            </div>
+            <div class="changelog-item">
+                <span class="tag">NEW</span>
+                Verb visualizer - animated thinking indicators (Stewing, Beboppin, etc.)
+            </div>
+            <div class="changelog-item">
+                <span class="tag">NEW</span>
+                Social sidebar with presence and DMs
+            </div>
+            <div class="changelog-item">
+                <span class="tag">NEW</span>
+                Session recording and replay
+            </div>
+            <div class="changelog-item">
+                <span class="tag">NEW</span>
+                Watch mode for live session streaming
+            </div>
+        </div>
+
+        <div class="requirements">
+            <strong>Requirements:</strong><br>
+            &middot; macOS 10.15 (Catalina) or later<br>
+            &middot; Claude Code installed (npm install -g @anthropic-ai/claude-code)<br>
+            &middot; /vibe MCP server installed (optional but recommended)
+        </div>
+
+        <div class="footer">
+            <a href="/">Back to /vibe</a> &middot;
+            <a href="https://github.com/brightseth/vibe-terminal">Source</a> &middot;
+            <a href="/community">Community</a> &middot;
+            <a href="mailto:seth@slashvibe.dev">Report Bug</a>
+        </div>
+    </div>
+
+    <script>
+        // Track downloads (placeholder - connect to analytics)
+        function trackDownload(type) {
+            console.log('Download tracked:', type);
+            // Future: Connect to analytics
+            // Future: Serve actual DMG files
+            alert('DMG builds coming soon! For now, build from source:\n\ngit clone https://github.com/brightseth/vibe-terminal\ncd vibe-terminal\nnpm install\nnpm run tauri build');
+            return false;
+        }
+
+        // Log page view
+        fetch('/api/health').catch(() => {});
+    </script>
+</body>
+</html>
