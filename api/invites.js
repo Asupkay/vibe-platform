@@ -59,12 +59,17 @@ function generateCode(handle) {
   return 'VIBE-' + random + '-' + handle.toUpperCase().slice(0, 4);
 }
 
-// How many codes each user tier gets
+// How many codes each user gets
+// Philosophy: Equal trust for all members. Hosts, not hierarchy.
+// The Terminal Party: everyone gets the same power to invite friends.
+const CODES_PER_USER = 3;
+
+// Legacy tier structure (kept for reference, no longer used)
 const CODES_PER_TIER = {
-  genesis: 3,      // First 100 users
-  waitlist: 2,     // Invited from waitlist
-  invited: 1,      // Invited by another user
-  default: 1
+  genesis: 3,
+  waitlist: 3,    // Changed: equal to genesis
+  invited: 3,     // Changed: equal to genesis
+  default: 3      // Changed: equal to genesis
 };
 
 // Code expiration (30 days)
@@ -139,15 +144,8 @@ export default async function handler(req, res) {
       });
     }
 
-    // Determine how many codes they can have
-    let maxCodes = CODES_PER_TIER.default;
-    if (userRecord.genesis) {
-      maxCodes = CODES_PER_TIER.genesis;
-    } else if (userRecord.invited_from_waitlist) {
-      maxCodes = CODES_PER_TIER.waitlist;
-    } else if (userRecord.invited_by) {
-      maxCodes = CODES_PER_TIER.invited;
-    }
+    // All users get equal invite power — hosts, not hierarchy
+    const maxCodes = CODES_PER_USER;
 
     // Count their existing unused codes
     const userCodesKey = 'vibe:invites:by:' + handle;
@@ -352,14 +350,8 @@ export default async function handler(req, res) {
       });
     }
 
-    let maxCodes = CODES_PER_TIER.default;
-    if (userRecord.genesis) {
-      maxCodes = CODES_PER_TIER.genesis;
-    } else if (userRecord.invited_from_waitlist) {
-      maxCodes = CODES_PER_TIER.waitlist;
-    } else if (userRecord.invited_by) {
-      maxCodes = CODES_PER_TIER.invited;
-    }
+    // All users get equal invite power — hosts, not hierarchy
+    const maxCodes = CODES_PER_USER;
 
     // Get all user's codes
     const userCodesKey = 'vibe:invites:by:' + handle;
