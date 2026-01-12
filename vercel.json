@@ -48,6 +48,8 @@
     { "source": "/api/health", "destination": "/api/health.js" },
     { "source": "/llms.txt", "destination": "/public/llms.txt" },
     { "source": "/api/invites", "destination": "/api/invites.js" },
+    { "source": "/api/invites/my", "destination": "/api/invites.js" },
+    { "source": "/api/invites/redeem", "destination": "/api/invites.js" },
     { "source": "/api/agents", "destination": "/api/agents.js" },
     { "source": "/share/:id", "destination": "/api/share/:id" },
     { "source": "/api/growth/leaderboard", "destination": "/api/growth/leaderboard.js" },

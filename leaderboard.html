@@ -129,13 +129,10 @@
         const res = await fetch('https://www.slashvibe.dev/api/growth/leaderboard');
         const data = await res.json();
 
-        // Update stats
-        document.getElementById('total-users').textContent = data.totalUsers || '--';
-        document.getElementById('genesis-remaining').textContent = data.genesisRemaining || '--';
-
-        // Calculate total invites
-        const totalInvites = (data.leaderboard || []).reduce((sum, u) => sum + (u.invites || 0), 0);
-        document.getElementById('total-invites').textContent = totalInvites;
+        // Update stats from API response
+        document.getElementById('total-users').textContent = data.stats?.total || '--';
+        document.getElementById('genesis-remaining').textContent = data.stats?.genesisRemaining || '--';
+        document.getElementById('total-invites').textContent = data.stats?.totalInvitesSent || 0;
 
         if (!data.leaderboard || data.leaderboard.length === 0) {
           document.getElementById('leaderboard').innerHTML = '<div class="loading">No builders yet</div>';
@@ -156,15 +153,14 @@
           const rankClass = rank <= 3 ? `rank-${rank}` : '';
 
           let badges = '';
-          if (user.isGenesis) badges += '<span class="badge badge-genesis">Genesis</span>';
-          if (user.streakDays >= 30) badges += '<span class="badge badge-dedicated">Dedicated</span>';
-          else if (user.streakDays >= 7) badges += '<span class="badge badge-verified">Verified</span>';
+          if (user.genesis) badges += '<span class="badge badge-genesis">Genesis</span>';
+          if (user.isActive) badges += '<span class="badge badge-verified">Active</span>';
 
           html += `
             <div class="leader-row">
               <span class="rank ${rankClass}">${rank}</span>
               <span class="handle">@${user.handle}${badges}</span>
-              <span class="invites">${user.invites || 0}</span>
+              <span class="invites">${user.successfulInvites || 0}</span>
               <span class="score">${user.growthScore || 0}</span>
             </div>
           `;
