@@ -67,6 +67,13 @@ rm -f "$MCP_DIR"
 ln -sf "$REPO_DIR/mcp-server" "$MCP_DIR"
 echo "Linked $MCP_DIR → $REPO_DIR/mcp-server"
 
+# Install npm dependencies
+echo ""
+echo "Installing dependencies..."
+cd "$REPO_DIR/mcp-server"
+npm install --quiet --no-progress
+echo "Dependencies installed"
+
 # Install statusline script
 if [ -f "$REPO_DIR/scripts/statusline.sh" ]; then
   cp "$REPO_DIR/scripts/statusline.sh" "$VIBE_DIR/statusline.sh"

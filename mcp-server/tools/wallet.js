@@ -12,26 +12,28 @@
 const fetch = require('node-fetch');
 
 module.exports = {
-  name: 'vibe_wallet',
-  description: 'Check your wallet balance and recent transactions. Shows tips sent/received, escrows, and current balance.',
+  definition: {
+    name: 'vibe_wallet',
+    description: 'Check your wallet balance and recent transactions. Shows tips sent/received, escrows, and current balance.',
 
-  inputSchema: {
-    type: 'object',
-    properties: {
-      limit: {
-        type: 'number',
-        description: 'Number of recent transactions to show (default 10, max 50)',
-        default: 10
-      },
-      show_balance: {
-        type: 'boolean',
-        description: 'Show current balance (default true)',
-        default: true
+    inputSchema: {
+      type: 'object',
+      properties: {
+        limit: {
+          type: 'number',
+          description: 'Number of recent transactions to show (default 10, max 50)',
+          default: 10
+        },
+        show_balance: {
+          type: 'boolean',
+          description: 'Show current balance (default true)',
+          default: true
+        }
       }
     }
   },
 
-  async execute({ limit = 10, show_balance = true }, context) {
+  async handler({ limit = 10, show_balance = true }, context) {
     try {
       const handle = context.handle;
 
